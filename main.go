@@ -5,6 +5,9 @@ import (
 	"log"
 	"os"
 
+	"github.com/incrypto32/airdropbot/handler"
+	"github.com/incrypto32/airdropbot/router"
+	"github.com/incrypto32/airdropbot/tgbotgo"
 	"github.com/joho/godotenv"
 )
 
@@ -13,10 +16,21 @@ func main() {
 
 	// Load ENV FIle
 	if err := godotenv.Load(); err != nil {
-
 		log.Panic("Failed loading env variables", err)
 	}
 
-	fmt.Println("Hello World")
-	fmt.Println(os.Getenv("BOT_TOKEN"))
+	port := os.Getenv("PORT")
+
+	// echo instance
+	r := router.New()
+
+	// tgbot
+	bot, err := tgbotgo.New(os.Getenv("BOT_TOKEN"), "https://api.telegram.org")
+	if err != nil {
+		log.Panic(err)
+	}
+
+	handler.New(r, bot)
+	log.Println(fmt.Sprintf("server started at http://localhost:%s", port))
+	r.Logger.Fatal(r.Start(":" + port))
 }
